@@ -6,7 +6,7 @@ Your Aylur's Widgets GNOME extension has been successfully reorganized from a fl
 
 ### Before (Old Structure)
 ```
-widgets@aylur/
+noname's panel/
 ├── extensions/              (13 individual files mixed together)
 ├── shared/                  (9 mixed utility files)
 ├── pref/                    (3 preference files)
@@ -16,7 +16,7 @@ widgets@aylur/
 
 ### After (New Structure)
 ```
-widgets@aylur/
+noname's panel/
 ├── src/                     (organized source code)
 │   ├── features/            (11 features grouped by UI type)
 │   │   ├── panel/           (4 widgets)
