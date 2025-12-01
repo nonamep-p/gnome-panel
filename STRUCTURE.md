@@ -13,7 +13,7 @@ The project has been reorganized from a flat extensions/shared structure to a fe
 ## Directory Structure
 
 ```
-widgets@aylur/
+noname's panel/
 ├── src/                              # Source code
 │   ├── features/                     # Feature implementations (UI widgets)
 │   │   ├── panel/                    # Panel-based widgets (status indicators)
