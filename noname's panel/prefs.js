@@ -1,6 +1,6 @@
 /* exported init fillPreferencesWindow */
 
-const {Adw, Gtk, Gio, GObject, GdkPixbuf} = imports.gi;
+const {Adw, Gtk, Gio, GObject} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Pages = Me.imports.src.preferences.pages;
@@ -57,45 +57,6 @@ class AboutPage extends Adw.PreferencesPage {
         versionRow.add_suffix(new Gtk.Label({valign: Gtk.Align.CENTER, label: `${Me.metadata.version}`}));
         versionGroup.add(versionRow);
         this.add(versionGroup);
-
-        const credits = new Adw.PreferencesGroup({title: _('Took code or inspiration from these projects')});
-        this.add(credits);
-        credits.add(this._addCredit(_('ArcMenu'), _('by andrew.zaech'), 'https://extensions.gnome.org/extension/3628/arcmenu'));
-        credits.add(this._addCredit(_('Workspace Indicator'), _('by fmullner'), 'https://extensions.gnome.org/extension/21/workspace-indicator'));
-        credits.add(this._addCredit(_('Workspace Indicator'), _('by fthx'), 'https://extensions.gnome.org/extension/3851/workspaces-bar'));
-        credits.add(this._addCredit(_('Nano System Monitor'), _('by eeeee'), 'https://extensions.gnome.org/extension/5037/nano-system-monitor'));
-        credits.add(this._addCredit(_('GNOME source code'), '', 'https://gitlab.gnome.org/GNOME/gnome-shell/-/tree/main/js/ui'));
-        credits.add(this._addCredit(_('Unite'), _('by hardpixel'), 'https://extensions.gnome.org/extension/1287/unite/'));
-
-        const donateGroup = new Adw.PreferencesGroup({title: _('If you would like to support my work')});
-        const donateRow = new Adw.ActionRow();
-        donateGroup.add(donateRow);
-
-        let pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(`${Me.path}/media/prefs/kofi.png`, -1, 50, true);
-        let donateImage = Gtk.Picture.new_for_pixbuf(pixbuf);
-        donateRow.add_prefix(new Gtk.LinkButton({
-            child: donateImage,
-            uri: 'https://ko-fi.com/aylur',
-        }));
-
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(`${Me.path}/media/prefs/gnome-logo.png`, -1, 50, true);
-        donateImage = Gtk.Picture.new_for_pixbuf(pixbuf);
-        donateRow.add_suffix(new Gtk.Label({
-            label: _('Also consider donating to'),
-            valign: Gtk.Align.CENTER,
-        }));
-        donateRow.add_suffix(new Gtk.LinkButton({
-            child: donateImage,
-            uri: 'https://www.gnome.org/support-gnome/donate',
-        }));
-
-        this.add(donateGroup);
-    }
-
-    _addCredit(name, by, link) {
-        const row = new Adw.ActionRow({title: by});
-        row.add_prefix(Gtk.LinkButton.new_with_label(link, name));
-        return row;
     }
 });
 

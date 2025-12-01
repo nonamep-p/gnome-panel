@@ -36,59 +36,86 @@ const Extensions = {
 };
 
 class Extension {
+    constructor() {
+        this._extensions = {};
+    }
+
     enable() {
-        const settings = ExtensionUtils.getSettings();
+        try {
+            const settings = ExtensionUtils.getSettings();
+            
+            for (const [name, config] of Object.entries(Extensions)) {
+                try {
+                    const module = this._importModule(config.path);
+                    if (!module || !module.Extension) {
+                        console.warn(`[${Me.metadata.uuid}] Module ${config.path} missing Extension class`);
+                        continue;
+                    }
+                    
+                    const extension = new module.Extension(settings);
+                    this._extensions[name] = extension;
+                    
+                    if (settings.get_boolean(config.key))
+                        this._toggleExtension(extension, true);
 
-        for (const extension in Extensions) {
-            if (Object.hasOwnProperty.call(Extensions, extension)) {
-                const { path, key } = Extensions[extension];
-
-                // Dynamically import based on path
-                const module = this._importModule(path);
-                this[extension] = new module.Extension(settings);
-                
-                if (settings.get_boolean(key))
-                    this._toggleExtension(this[extension]);
-
-                settings.connect(`changed::${key}`, () => {
-                    this._toggleExtension(this[extension]);
-                });
+                    settings.connect(`changed::${config.key}`, () => {
+                        const isEnabled = settings.get_boolean(config.key);
+                        this._toggleExtension(extension, isEnabled);
+                    });
+                } catch (error) {
+                    console.warn(`[${Me.metadata.uuid}] Failed to load ${name}: ${error.message}`);
+                }
             }
+        } catch (error) {
+            console.error(`[${Me.metadata.uuid}] Extension enable failed: ${error.message}`);
         }
     }
 
     disable() {
-        for (const extension in Extensions) {
-            if (Object.hasOwnProperty.call(Extensions, extension)) {
-                if (this[extension].enabled) {
-                    this[extension].disable();
-                    this[extension].enabled = false;
+        try {
+            for (const [name, extension] of Object.entries(this._extensions)) {
+                try {
+                    if (extension && extension.enabled) {
+                        extension.disable();
+                    }
+                } catch (error) {
+                    console.warn(`[${Me.metadata.uuid}] Failed to disable ${name}: ${error.message}`);
                 }
-
-                this[extension] = null;
             }
+            this._extensions = {};
+        } catch (error) {
+            console.error(`[${Me.metadata.uuid}] Extension disable failed: ${error.message}`);
         }
     }
 
-    _toggleExtension(extension) {
-        if (!extension.enabled) {
-            extension.enable();
-            extension.enabled = true;
-        } else {
-            extension.disable();
-            extension.enabled = false;
+    _toggleExtension(extension, enable) {
+        try {
+            if (enable && !extension.enabled) {
+                extension.enable();
+                extension.enabled = true;
+            } else if (!enable && extension.enabled) {
+                extension.disable();
+                extension.enabled = false;
+            }
+        } catch (error) {
+            console.warn(`[${Me.metadata.uuid}] Toggle failed: ${error.message}`);
         }
     }
 
     _importModule(path) {
-        // Convert dot notation to nested imports
-        // e.g., 'src.features.panel.batteryBar' -> Me.imports.src.features.panel.batteryBar
-        const parts = path.split('.');
-        let module = Me.imports;
-        for (const part of parts) {
-            module = module[part];
+        try {
+            const parts = path.split('.');
+            let module = Me.imports;
+            for (const part of parts) {
+                module = module[part];
+                if (!module) {
+                    throw new Error(`Failed to load ${path}: part ${part} is undefined`);
+                }
+            }
+            return module;
+        } catch (error) {
+            throw new Error(`Failed to import ${path}: ${error.message}`);
         }
-        return module;
     }
 }
 
