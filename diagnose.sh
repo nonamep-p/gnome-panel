@@ -3,9 +3,12 @@
 # GNOME Panel Extension Diagnostic Script
 # This script helps diagnose installation and compatibility issues
 
+set -e
+
 EXTENSION_ID="nonamesPanel@noname"
 EXTENSION_PATH="$HOME/.local/share/gnome-shell/extensions/$EXTENSION_ID"
 REPO_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCHEMA_ID="org.gnome.shell.extensions.$EXTENSION_ID"
 
 echo "=== GNOME Panel Extension Diagnostic Report ==="
 echo "Report generated: $(date)"
@@ -44,8 +47,50 @@ if [ -f "$METADATA" ]; then
     echo ""
     echo "Content:"
     cat "$METADATA" | sed 's/^/  /'
+    
+    # Check required fields
+    echo ""
+    echo "Validating metadata.json:"
+    if ! jq -e '.uuid' "$METADATA" &>/dev/null; then
+        echo "❌ Missing required field: uuid"
+    fi
+    if ! jq -e '.shell-version' "$METADATA" &>/dev/null; then
+        echo "❌ Missing required field: shell-version"
+    fi
 else
     echo "❌ metadata.json not found"
+fi
+
+# Check GSettings schema
+echo ""
+echo "4. GSettings Schema"
+echo "============================="
+SCHEMA_FILE="/usr/share/glib-2.0/schemas/org.gnome.shell.extensions.nonamesPanel.gschema.xml"
+if [ -f "$SCHEMA_FILE" ]; then
+    echo "✓ GSettings schema file found"
+    
+    # Try to compile schemas
+    echo ""
+    echo "Validating schema:"
+    if glib-compile-schemas --dry-run /usr/share/glib-2.0/schemas/ 2>&1 | grep -q "error"; then
+        echo "❌ Schema validation failed:"
+        glib-compile-schemas --dry-run /usr/share/glib-2.0/schemas/ 2>&1 | grep -i error
+    else
+        echo "✓ Schema is valid"
+    fi
+    
+    # Check if schema is available
+    echo ""
+    echo "Checking schema availability:"
+    if gsettings list-schemas | grep -q "$SCHEMA_ID"; then
+        echo "✓ Schema is available in GSettings"
+    else
+        echo "❌ Schema not found in GSettings"
+        echo "   Try running: sudo glib-compile-schemas /usr/share/glib-2.0/schemas/"
+    fi
+else
+    echo "❌ GSettings schema file not found at: $SCHEMA_FILE"
+    echo "   Make sure to run the install script with sudo to install the schema"
 fi
 echo ""
 

@@ -1,0 +1,44 @@
+{
+  "name": "gnome-panel-extension",
+  "version": "1.0.0",
+  "description": "GNOME Shell extension for an enhanced panel experience",
+  "main": "extension.js",
+  "scripts": {
+    "build": "meson setup build && ninja -C build",
+    "install:local": "./install.sh",
+    "test": "eslint \"**/*.js\" --ignore-pattern \"**/schemas/\"",
+    "diagnose": "./diagnose.sh",
+    "clean": "rm -rf build/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nonamep-p/gnome-panel.git"
+  },
+  "keywords": [
+    "gnome-shell",
+    "gnome-shell-extension",
+    "gnome-panel",
+    "gnome"
+  ],
+  "author": "Your Name",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/nonamep-p/gnome-panel/issues"
+  },
+  "homepage": "https://github.com/nonamep-p/gnome-panel#readme",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "eslint-config-google": "^0.14.0"
+  },
+  "eslintConfig": {
+    "extends": "google",
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "rules": {
+      "require-jsdoc": "off",
+      "max-len": ["error", { "code": 100 }]
+    }
+  }
+}

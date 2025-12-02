@@ -1,0 +1,78 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        gnome-version: [45, 46, 47, 48]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gettext jq meson ninja-build
+
+    - name: Build extension
+      run: |
+        meson setup build
+        ninja -C build
+
+    - name: Run linter
+      run: |
+        npm install -g eslint
+        eslint "**/*.js" --ignore-pattern "**/schemas/"
+
+    - name: Check metadata.json
+      run: |
+        jq -e '.uuid' nonamesPanel@noname/metadata.json
+        jq -e '.shell-version' nonamesPanel@noname/metadata.json
+
+    - name: Validate GSettings schema
+      run: |
+        cd nonamesPanel@noname/schemas
+        glib-compile-schemas --dry-run .
+
+    - name: Run tests (if any)
+      run: |
+        if [ -f "test/run-tests.sh" ]; then
+          ./test/run-tests.sh
+        fi
+
+  release:
+    name: Create Release
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build extension
+      run: |
+        VERSION=$(jq -r '.version' nonamesPanel@noname/metadata.json)
+        mkdir -p dist
+        zip -r "dist/gnome-panel-extension-v$VERSION.zip" nonamesPanel@noname/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

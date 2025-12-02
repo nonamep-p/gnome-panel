@@ -1,0 +1,71 @@
+# Build directories
+/build/
+/dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# GNOME Shell cache
+.gnome-shell-extension/
+~/.local/share/gnome-shell/extensions/nonamesPanel@noname/
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Node.js dependencies (if any)
+node_modules/
+npm-debug.log*
+
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local development
+.env
+.env.local
+
+# Build artifacts
+*.o
+*.so
+*.a
+*.la
+*.lo
+*.loT
+
+# Compiled schema files
+*.gschema.valid
+*.gschema.xml.valid
+*.gschema.xml.bak
+
+# Temporary files
+*~
+*.swp
+*.swo
+
+# Local settings
+local-settings.json
+
+# Debug logs
+debug.log
+
+# Ignore the extension directory in the repository
+/nonamesPanel@noname/
+
+# Ignore any built files in the extension directory
+**/schemas/gschemas.compiled

@@ -7,8 +7,9 @@ set -e
 
 EXTENSION_ID="nonamesPanel@noname"
 EXTENSION_NAME="Panel Extension"
-EXTENSION_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/noname's panel"
+EXTENSION_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$EXTENSION_ID"
 INSTALL_DIR="$HOME/.local/share/gnome-shell/extensions/$EXTENSION_ID"
+SCHEMA_DIR="/usr/share/glib-2.0/schemas"
 
 echo "=== GNOME Panel Extension Installer ==="
 echo ""
@@ -37,11 +38,13 @@ fi
 echo "📋 Copying extension files..."
 cp -r "$EXTENSION_DIR" "$INSTALL_DIR"
 
-# Compile GSettings schema
-if [ -d "$INSTALL_DIR/resources/schemas" ]; then
-    echo "⚙️  Compiling GSettings schema..."
-    cd "$INSTALL_DIR/resources/schemas"
-    glib-compile-schemas . 2>&1 || echo "⚠️  Warning: Could not compile schemas (glib-compile-schemas not found)"
+# Install and compile GSettings schema
+if [ -d "$EXTENSION_DIR/schemas" ]; then
+    echo "⚙️  Installing GSettings schema..."
+    sudo mkdir -p "$SCHEMA_DIR"
+    sudo cp "$EXTENSION_DIR/schemas/org.gnome.shell.extensions.nonamesPanel.gschema.xml" "$SCHEMA_DIR/"
+    echo "🔧 Compiling GSettings schema..."
+    sudo glib-compile-schemas "$SCHEMA_DIR" 2>/dev/null || echo "⚠️  Warning: Could not compile schemas"
 fi
 
 # Try to enable the extension
