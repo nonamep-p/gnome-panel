@@ -23,12 +23,12 @@ A powerful and customizable GNOME Shell extension that enhances your panel and d
 
 ## Installation
 
-### Manual Installation
+### Method 1: Manual Installation
 
 1. Copy the extension to your GNOME extensions directory:
 
 ```bash
-cp -r "noname's panel" ~/.local/share/gnome-shell/extensions/
+cp -r "noname's panel" ~/.local/share/gnome-shell/extensions/nonamesPanel@noname
 ```
 
 2. Restart GNOME Shell:
@@ -37,10 +37,10 @@ cp -r "noname's panel" ~/.local/share/gnome-shell/extensions/
 
 3. Enable the extension in GNOME Settings or the Extensions app
 
-### Quick Enable
+### Method 2: Quick Enable
 
 ```bash
-gnome-extensions enable "noname's panel"
+gnome-extensions enable "nonamesPanel@noname"
 ```
 
 ## Configuration
@@ -50,3 +50,61 @@ Access the extension preferences through:
 - Or **GNOME Extensions** app
 
 Enable or disable individual features to customize your experience.
+
+## Troubleshooting
+
+### Extension Not Appearing in Settings
+
+1. **Check installation path:**
+   ```bash
+   ls ~/.local/share/gnome-shell/extensions/nonamesPanel@noname/
+   ```
+   Should show: `extension.js`, `metadata.json`, `prefs.js`, `resources/`, `src/`, `stylesheet.css`
+
+2. **Verify metadata.json:**
+   ```bash
+   cat ~/.local/share/gnome-shell/extensions/nonamesPanel@noname/metadata.json
+   ```
+   Ensure it has valid JSON syntax and includes required fields: `uuid`, `shell-version`, `settings-schema`
+
+3. **Check GNOME Shell logs:**
+   ```bash
+   journalctl -f | grep -i "nonamesPanel"
+   ```
+   Look for error messages indicating what went wrong
+
+4. **Force enable:**
+   ```bash
+   gnome-extensions enable nonamesPanel@noname
+   ```
+
+### Features Not Working
+
+1. **Verify GSettings schema:**
+   ```bash
+   gsettings list-schemas | grep nonamesPanel
+   ```
+
+2. **Check individual feature status:**
+   - Open Extension Preferences
+   - Enable/disable individual features
+   - Check if changes take effect
+
+3. **Clear cache and restart:**
+   ```bash
+   rm -rf ~/.cache/gnome-shell/
+   killall gnome-shell
+   ```
+
+### Performance Issues
+
+- Disable unused features in preferences
+- Check system resources: CPU, RAM, disk space
+- Review GNOME Shell logs for errors
+
+### Uninstallation
+
+```bash
+rm -rf ~/.local/share/gnome-shell/extensions/nonamesPanel@noname
+gnome-extensions disable nonamesPanel@noname
+```
