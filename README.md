@@ -23,9 +23,20 @@ A powerful and customizable GNOME Shell extension that enhances your panel and d
 
 ## Installation
 
-### Method 1: Manual Installation
+### Method 1: Automated Installation (Recommended)
 
-1. Copy the extension to your GNOME extensions directory:
+Run the installation script:
+
+```bash
+bash install.sh
+```
+
+This will:
+- Copy the extension to the correct directory
+- Compile the GSettings schema
+- Enable the extension (if possible)
+
+### Method 2: Manual Installation
 
 ```bash
 cp -r "noname's panel" ~/.local/share/gnome-shell/extensions/nonamesPanel@noname
@@ -37,11 +48,26 @@ cp -r "noname's panel" ~/.local/share/gnome-shell/extensions/nonamesPanel@noname
 
 3. Enable the extension in GNOME Settings or the Extensions app
 
-### Method 2: Quick Enable
+### Method 3: Quick Enable
 
 ```bash
 gnome-extensions enable "nonamesPanel@noname"
 ```
+
+## Diagnostics
+
+If you encounter issues, run the diagnostic script:
+
+```bash
+bash diagnose.sh
+```
+
+This will check:
+- GNOME Shell version compatibility
+- Extension installation path
+- GSettings schema registration
+- Recent error logs
+- File permissions
 
 ## Configuration
 
