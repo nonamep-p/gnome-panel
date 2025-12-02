@@ -26,7 +26,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y gettext jq meson ninja-build
+        # gettext: for intl tools used by GNOME projects
+        # jq: for JSON checks on metadata.json
+        # meson, ninja-build: for the meson-based build
+        # libglib2.0-bin: provides glib-compile-schemas used in schema validation
+        sudo apt-get install -y gettext jq meson ninja-build libglib2.0-bin
 
     - name: Build extension
       run: |
