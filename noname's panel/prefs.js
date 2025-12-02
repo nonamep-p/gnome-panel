@@ -1,16 +1,27 @@
 /* exported init fillPreferencesWindow */
 
 const {Adw, Gtk, Gio, GObject} = imports.gi;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Pages = Me.imports.src.preferences.pages;
-const {SwitchRow} = Me.imports.src.preferences.widgets;
 
-const _ = imports.gettext.domain(Me.metadata.uuid).gettext;
+let ExtensionUtils, Me, Pages, SwitchRow, _;
+let PREFS_AVAILABLE = true;
+try {
+    ExtensionUtils = imports.misc.extensionUtils;
+    Me = ExtensionUtils.getCurrentExtension();
+    Pages = Me.imports.src.preferences.pages;
+    SwitchRow = Me.imports.src.preferences.widgets.SwitchRow;
+    _ = imports.gettext.domain(Me.metadata.uuid).gettext;
+} catch (e) {
+    log(`[nonamesPanel] prefs init failed: ${e}`);
+    PREFS_AVAILABLE = false;
+}
 
 function init() {
-    ExtensionUtils.initTranslations(Me.metadata.uuid);
+    if (PREFS_AVAILABLE && ExtensionUtils) {
+        try { ExtensionUtils.initTranslations(Me.metadata.uuid); } catch (e) { log(e); }
+    }
 }
+
+if (PREFS_AVAILABLE) {
 
 const ToggleRow = GObject.registerClass(
 class ToggleRow extends Adw.ActionRow {
@@ -92,4 +103,14 @@ function fillPreferencesWindow(window) {
     window.add(new AboutPage());
     window.search_enabled = true;
     window.can_navigate_back = true;
+}
+
+} else {
+    // Fallback when prefs cannot be initialized (e.g. incompatible environment)
+    function fillPreferencesWindow(window) {
+        if (window && window.add) {
+            const label = new Gtk.Label({label: 'Preferences are unavailable on this system.'});
+            try { window.add(label); } catch (e) { log(`[nonamesPanel] fallback prefs UI failed: ${e}`); }
+        }
+    }
 }
